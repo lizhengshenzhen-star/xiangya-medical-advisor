@@ -1,0 +1,137 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-07-22",
+  "disclaimer": "医院相对优势基于公开专科定位与常见就诊路径归纳，用于两院之间的优先顺序参考；不构成疗效承诺或官方排名声明。号源与收治以医院当日安排为准。",
+  "长沙": {
+    "精神心理": {
+      "primary": {
+        "hospital": "中南大学湘雅二医院",
+        "campus": "xiangya2",
+        "score": 9.8,
+        "displayLabel": "中南大学湘雅二医院（精神卫生相关专科）",
+        "reasons": [
+          "精神卫生专科资源在湘雅体系内更为集中",
+          "焦虑/抑郁/惊恐等常见路径的评估与干预相对成熟",
+          "心理治疗与药物联合评估的门诊结构更完整"
+        ]
+      },
+      "secondary": [
+        {
+          "hospital": "中南大学湘雅医院",
+          "campus": "xiangya",
+          "score": 8.3,
+          "reasons": [
+            "综合诊疗平台强",
+            "更适合综合躯体疾病合并心理问题、需要多科协同时"
+          ]
+        }
+      ],
+      "suggestedDepartments": [
+        "精神卫生中心 / 精神卫生科",
+        "焦虑抑郁相关专病门诊（如有）",
+        "心理咨询专科 / 心理治疗门诊"
+      ],
+      "not_recommended_reason": "湘雅本部综合实力很强，但对于以焦虑、抑郁、失眠、惊恐等为核心诉求、且不以复杂躯体病协同为主的首次就诊，湘雅二医院的精神专科资源通常更匹配。",
+      "urgency": "outpatient"
+    },
+    "神经外科疑难": {
+      "primary": {
+        "hospital": "中南大学湘雅医院",
+        "campus": "xiangya",
+        "score": 9.6,
+        "displayLabel": "中南大学湘雅医院（神经外科相关平台）",
+        "reasons": [
+          "神经外科综合平台与疑难评估路径相对更完整",
+          "复杂颅脑疾病手术与多学科协作经验更集中"
+        ]
+      },
+      "secondary": [
+        {
+          "hospital": "中南大学湘雅二医院",
+          "campus": "xiangya2",
+          "score": 8.4,
+          "reasons": [
+            "神经外科与急危重症协同能力强",
+            "可作为并行核验或急诊入口"
+          ]
+        }
+      ],
+      "suggestedDepartments": ["神经外科", "神经内科（鉴别后转诊）"],
+      "not_recommended_reason": "附二在急危重症与部分神经路径上很强，但对以脑肿瘤、动脉瘤等疑难神经外科评估/手术决策为主的诉求，湘雅本部神经外科综合平台通常更优先。",
+      "urgency": "outpatient"
+    },
+    "急危重症": {
+      "primary": {
+        "hospital": "中南大学湘雅二医院",
+        "campus": "xiangya2",
+        "score": 9.5,
+        "displayLabel": "中南大学湘雅二医院（急诊/重症通道）",
+        "reasons": [
+          "急诊与重症收治体系在区域就诊路径中常用且相对成熟",
+          "突发胸痛、呼吸困难、意识障碍等更应走急诊而非普通门诊"
+        ]
+      },
+      "secondary": [
+        {
+          "hospital": "中南大学湘雅医院",
+          "campus": "xiangya",
+          "score": 9.2,
+          "reasons": [
+            "急危重症救治能力同样强",
+            "就近、可最快送达的急诊通道优先于院区名气"
+          ]
+        }
+      ],
+      "suggestedDepartments": ["急诊科", "胸痛/卒中相关绿色通道（如适用）"],
+      "not_recommended_reason": "此场景不应在两院之间纠结普通门诊专家号；应选择能最快抵达并具备急诊处理能力的医院。若两院距离接近，附二急诊/重症路径常被作为优先参考，但就近可及性高于院区偏好。",
+      "urgency": "emergency",
+      "emergencyAction": "立即前往就近具备急诊能力的医院急诊科，不要等待普通门诊号源。"
+    },
+    "呼吸与胸部": {
+      "primary": {
+        "hospital": "中南大学湘雅医院",
+        "campus": "xiangya",
+        "score": 9.2,
+        "displayLabel": "中南大学湘雅医院（呼吸/胸部相关平台）",
+        "reasons": [
+          "呼吸与胸部相关专科平台完整",
+          "适合需要系统评估与多学科讨论的胸部问题"
+        ]
+      },
+      "secondary": [
+        {
+          "hospital": "中南大学湘雅二医院",
+          "campus": "xiangya2",
+          "score": 8.6,
+          "reasons": ["综合实力强，可作为备选或急诊入口"]
+        }
+      ],
+      "suggestedDepartments": ["呼吸与危重症医学科", "胸外科（若偏手术决策）"],
+      "not_recommended_reason": "附二综合能力强，但对以呼吸系统疑难评估或胸部手术决策为主的路径，湘雅本部相关平台通常更优先。",
+      "urgency": "outpatient"
+    },
+    "综合未明": {
+      "primary": {
+        "hospital": "中南大学湘雅医院",
+        "campus": "xiangya",
+        "score": 8.5,
+        "displayLabel": "中南大学湘雅医院（综合首诊平台）",
+        "reasons": [
+          "综合科室齐全，适合症状未分清时的首诊分流",
+          "便于后续按检查结果转专科"
+        ]
+      },
+      "secondary": [
+        {
+          "hospital": "中南大学湘雅二医院",
+          "campus": "xiangya2",
+          "score": 8.4,
+          "reasons": ["同样具备完整综合诊疗能力，可按交通与号源选择"]
+        }
+      ],
+      "suggestedDepartments": ["全科医学科 / 对应症状相关专科首诊"],
+      "not_recommended_reason": "在疾病场景尚不清晰时，两院综合平台差距不足以单独决定；更关键的是尽快完成规范首诊分流，而不是在名气之间空转。",
+      "urgency": "outpatient"
+    }
+  }
+}

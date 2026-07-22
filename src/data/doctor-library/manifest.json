@@ -1,0 +1,25 @@
+{
+  "version": "1.2.0",
+  "updatedAt": "2026-07-22",
+  "disclaimer": "本库覆盖中南大学湘雅医院与湘雅二医院。医生档案主要来自好大夫公开页、科室出诊表与公开患者评价自动归纳，并与人工精标记录合并；不构成诊疗建议。出诊与号源以医院官方平台为准。",
+  "campuses": [
+    "xiangya",
+    "xiangya2"
+  ],
+  "files": [
+    "campuses/xiangya.json",
+    "campuses/xiangya2.json"
+  ],
+  "fieldGuide": {
+    "id": "全局唯一，建议 campus_dept_name拼音",
+    "hospitalCampus": "xiangya | xiangya2",
+    "departmentCode": "见 hospitalDepartments.ts",
+    "serviceRole": "physician | psychiatrist | clinical_psychologist | counselor | path",
+    "capabilityTags": "CapabilityTag 枚举值数组",
+    "evidenceLevel": "strong | medium | weak | insufficient",
+    "sources": "公开来源备注，便于运营复核"
+  },
+  "source": "haodf_public",
+  "doctorCount": 1684,
+  "scheduleFetchedAt": "2026-07-22T16:24:22"
+}

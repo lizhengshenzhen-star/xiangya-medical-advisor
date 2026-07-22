@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+*.tsbuildinfo
+
+# local / scrape artifacts
+scripts/raw/
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# editors / tooling
+.vscode/
+.idea/
+.vercel/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
