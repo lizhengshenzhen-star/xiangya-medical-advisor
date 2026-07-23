@@ -1,5 +1,5 @@
 {
-  "name": "xiangya-medical-advisor-v1",
+  "name": "xiangya-medical-advisor",
   "compatibility_date": "2025-07-01",
   "assets": {
     "directory": "./dist",
