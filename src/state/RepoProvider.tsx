@@ -3,11 +3,21 @@ import { LocalStorageStore } from "../repositories/store";
 import { DoctorRepository } from "../repositories/doctorRepository";
 import { CaseRepository } from "../repositories/caseRepository";
 import { ReportRepository } from "../repositories/reportRepository";
+import {
+  AnalyticsRepository,
+  ConsultRepository,
+  DoctorOverlayRepository,
+} from "../repositories/consultRepository";
+import { UserRepository } from "../repositories/userRepository";
 
 interface Repos {
   doctors: DoctorRepository;
   cases: CaseRepository;
   reports: ReportRepository;
+  consults: ConsultRepository;
+  users: UserRepository;
+  analytics: AnalyticsRepository;
+  doctorOverlays: DoctorOverlayRepository;
 }
 
 const RepoContext = createContext<Repos | null>(null);
@@ -19,6 +29,10 @@ export function RepoProvider({ children }: { children: ReactNode }) {
       doctors: new DoctorRepository(store),
       cases: new CaseRepository(store),
       reports: new ReportRepository(store),
+      consults: new ConsultRepository(store),
+      users: new UserRepository(store),
+      analytics: new AnalyticsRepository(store),
+      doctorOverlays: new DoctorOverlayRepository(store),
     };
   }, []);
   return <RepoContext.Provider value={value}>{children}</RepoContext.Provider>;

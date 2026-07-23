@@ -2,6 +2,10 @@ import {
   classifyDiseaseScenario,
   type DiseaseScenario,
 } from "./diseaseScenarioClassifier";
+import {
+  detectPreferredGender,
+  type PreferredGender,
+} from "./doctorGender";
 
 export type VisitGoal = "first_visit" | "diagnosis" | "surgery" | "follow_up";
 export type UrgencyLevel = "low" | "medium" | "high";
@@ -16,6 +20,8 @@ export interface IntentExtractResult {
   scenarioConfidence: number;
   /** 双路径提示，如精神心理 + 心慌排查 */
   dualPaths?: string[];
+  /** 用户明确提出的医生性别偏好 */
+  preferredGender?: PreferredGender;
   raw: string;
 }
 
@@ -115,6 +121,12 @@ export function extractIntent(input: string): IntentExtractResult {
     confidence = Math.max(confidence, 0.85);
   }
 
+  const preferredGender = detectPreferredGender(raw);
+  if (preferredGender) {
+    matched = [...new Set([...matched, preferredGender === "female" ? "女医生" : "男医生"])];
+    confidence = Math.max(confidence, 0.9);
+  }
+
   return {
     chiefComplaint: extractChiefComplaint(raw),
     diseaseScenario: scenario,
@@ -124,6 +136,7 @@ export function extractIntent(input: string): IntentExtractResult {
     matchedKeywords: matched,
     scenarioConfidence: confidence,
     dualPaths: detectDualPaths(raw, scenario),
+    preferredGender,
     raw,
   };
 }

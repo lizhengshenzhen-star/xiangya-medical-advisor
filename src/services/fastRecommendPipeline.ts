@@ -55,6 +55,7 @@ export function runFastRecommend(params: {
     urgency: intent.urgency,
     chiefComplaint: intent.chiefComplaint,
     dualPaths: intent.dualPaths,
+    preferredGender: intent.preferredGender,
     rankingBias: params.rankingBias,
     doctors: params.doctors,
   });

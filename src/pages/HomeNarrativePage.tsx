@@ -47,10 +47,21 @@ export function HomeNarrativePage() {
 
   const runRecommend = useCallback(
     async (input: string) => {
-      const narrative = input.trim();
+      let narrative = input.trim();
       if (narrative.length < 4) {
         alert("请用一句话说明你想解决的问题。");
         return;
+      }
+      // 补充条件（如「最好是女医生」）自动拼到上次诉求，避免结果不变/丢上下文
+      const prev = session.narrative.trim();
+      if (
+        prev &&
+        narrative !== prev &&
+        !narrative.includes(prev.slice(0, Math.min(12, prev.length))) &&
+        narrative.length <= 40
+      ) {
+        narrative = `${prev}；${narrative}`;
+        setText(narrative);
       }
       setBusy(true);
       const pool = await doctors.listAll();

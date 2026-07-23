@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --color-medical-50: #eff6ff;
+  --color-medical-100: #dbeafe;
+  --color-medical-200: #bfdbfe;
+  --color-medical-500: #3b82f6;
+  --color-medical-600: #2563eb;
+  --color-medical-700: #1d4ed8;
+  --color-medical-800: #1e40af;
+  --color-medical-950: #172554;
+  --color-match-high: #16a34a;
+  --color-match-mid: #2563eb;
+  --color-match-warn: #ea580c;
+  --color-match-low: #6b7280;
+}
+
+.decision-root {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Soften global shell chrome when viewing decision page */
+.shell:has(.decision-root) > .topbar {
+  max-width: 390px;
+  margin-inline: auto;
+}
+
+.shell:has(.decision-root) > main {
+  padding: 0;
+  max-width: none;
+}

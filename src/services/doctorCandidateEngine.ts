@@ -1,7 +1,11 @@
-import type { DoctorProfile, HospitalCampus } from "../models/types";
+import type { CapabilityTag, DoctorProfile, HospitalCampus } from "../models/types";
 import { decideHospital } from "./hospitalDecisionEngine";
 import type { DiseaseScenario } from "./diseaseScenarioClassifier";
 import type { VisitGoal, UrgencyLevel } from "./intentExtractor";
+import {
+  inferDoctorGender,
+  type PreferredGender,
+} from "./doctorGender";
 
 export type BookingHint = "普通" | "专家" | "专病门诊" | "急诊";
 export type UrgencyLabel = "急诊" | "72小时内" | "1周内" | "可预约";
@@ -23,6 +27,7 @@ export interface DoctorDirectionCandidate {
     name: string;
     title: string;
     department: string;
+    gender?: PreferredGender | "unknown";
   }>;
   isEmergency?: boolean;
 }
@@ -34,6 +39,7 @@ export interface GenerateCandidatesInput {
   urgency: UrgencyLevel;
   chiefComplaint?: string;
   dualPaths?: string[];
+  preferredGender?: PreferredGender;
   /** 追问后的排序偏置 */
   rankingBias?: {
     preferSurgery?: boolean;
@@ -50,32 +56,73 @@ function urgencyLabel(u: UrgencyLevel, emergency: boolean): UrgencyLabel {
   return "可预约";
 }
 
+function titleRank(title: string): number {
+  if (title.includes("一级主任") || title.includes("教授")) return 4;
+  if (title.includes("主任")) return 3;
+  if (title.includes("副主")) return 2;
+  return 1;
+}
+
 function pickNamed(
   doctors: DoctorProfile[] | undefined,
   campus: HospitalCampus,
   codes: string[],
-  limit = 3
+  limit = 3,
+  opts?: {
+    preferredGender?: PreferredGender;
+    preferTags?: CapabilityTag[];
+  },
 ) {
   if (!doctors?.length) return [];
-  return doctors
+  const preferTags = opts?.preferTags || [];
+  const preferredGender = opts?.preferredGender;
+
+  const scored = doctors
     .filter(
       (d) =>
         !d.isPathCard &&
         d.hospitalCampus === campus &&
-        (codes.length === 0 || codes.includes(d.departmentCode))
+        (codes.length === 0 || codes.includes(d.departmentCode)),
     )
-    .sort((a, b) => {
-      const rank = (t: string) =>
-        t.includes("主任") ? 3 : t.includes("副主") ? 2 : 1;
-      return rank(b.title) - rank(a.title);
+    .map((d) => {
+      const gender = inferDoctorGender(d);
+      let score = titleRank(d.title) * 10;
+      for (const tag of preferTags) {
+        if (d.capabilityTags.includes(tag)) score += 8;
+      }
+      if (preferredGender) {
+        if (gender === preferredGender) score += 100;
+        else if (gender === "unknown") score += 10;
+        else score -= 40;
+      }
+      // 心理治疗路径优先咨询专科 / 非纯开药角色
+      if (
+        d.departmentCode === "counseling_clinic" ||
+        d.serviceRole === "clinical_psychologist" ||
+        d.serviceRole === "counselor"
+      ) {
+        score += 12;
+      }
+      return { d, gender, score };
     })
-    .slice(0, limit)
-    .map((d) => ({
-      id: d.id,
-      name: d.name,
-      title: d.title,
-      department: d.department,
-    }));
+    .sort((a, b) => b.score - a.score);
+
+  // 有明确性别偏好时：尽量保证前排是匹配性别；不足再回填
+  const matched = preferredGender
+    ? scored.filter((x) => x.gender === preferredGender)
+    : scored;
+  const fallback = preferredGender
+    ? scored.filter((x) => x.gender !== preferredGender)
+    : [];
+  const ordered = [...matched, ...fallback].slice(0, limit);
+
+  return ordered.map(({ d, gender }) => ({
+    id: d.id,
+    name: d.name,
+    title: d.title,
+    department: d.department,
+    gender,
+  }));
 }
 
 /**
@@ -138,6 +185,17 @@ export function generateCandidates(
   if (input.scenario === "精神心理") {
     const primaryCampus = hospital.primaryCampus;
     const preferCounsel = bias.preferCounseling !== false;
+    const genderHint = input.preferredGender
+      ? input.preferredGender === "female"
+        ? "已按你的要求优先匹配女医生"
+        : "已按你的要求优先匹配男医生"
+      : null;
+    const psychTags = (
+      preferCounsel
+        ? ["CBT", "psychotherapy", "depression_management", "psychological_counseling"]
+        : ["depression_management", "mental_health"]
+    ) as CapabilityTag[];
+
     out.push({
       id: "psy_xy2",
       hospital: "中南大学湘雅二医院",
@@ -146,21 +204,27 @@ export function generateCandidates(
       doctorType: preferCounsel
         ? "焦虑抑郁相关专病 / 心理治疗门诊"
         : "精神卫生评估门诊",
-      score: 95 + (primaryCampus === "xiangya2" ? 2 : 0),
+      score: 95 + (primaryCampus === "xiangya2" ? 2 : 0) + (input.preferredGender ? 1 : 0),
       reasons: [
         "湘雅体系内精神专科资源更集中，适合失眠、焦虑、惊恐等首次方向",
         "可同时评估是否需要会谈治疗或药物路径",
+        ...(genderHint ? [genderHint] : []),
       ],
       whyNotAlternative:
         "湘雅本部综合强，但核心精神心理首次就诊通常更匹配附二专科路径。",
       bookingHint: "专病门诊",
       urgencyLabel: urgencyLabel(input.urgency, false),
       suitedFor: "失眠、焦虑、惊恐、长期情绪问题",
-      namedDoctors: pickNamed(input.doctors, "xiangya2", [
-        "psychiatry",
-        "counseling_clinic",
-        "clinical_psychology",
-      ]),
+      namedDoctors: pickNamed(
+        input.doctors,
+        "xiangya2",
+        ["psychiatry", "counseling_clinic", "clinical_psychology"],
+        5,
+        {
+          preferredGender: input.preferredGender,
+          preferTags: psychTags,
+        },
+      ),
     });
 
     if (input.dualPaths?.includes("心律失常排查") || bias.preferCardiologyCheck) {
@@ -194,10 +258,13 @@ export function generateCandidates(
       bookingHint: "普通",
       urgencyLabel: urgencyLabel(input.urgency, false),
       suitedFor: "综合躯体疾病合并心理问题",
-      namedDoctors: pickNamed(input.doctors, "xiangya", [
-        "clinical_psychology",
-        "psychiatry",
-      ], 2),
+      namedDoctors: pickNamed(
+        input.doctors,
+        "xiangya",
+        ["clinical_psychology", "psychiatry"],
+        2,
+        { preferredGender: input.preferredGender, preferTags: psychTags },
+      ),
     });
   } else if (input.scenario === "呼吸与胸部") {
     const surgery = input.goal === "surgery" || bias.preferSurgery;
